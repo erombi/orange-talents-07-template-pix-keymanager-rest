@@ -1,0 +1,14 @@
+micronaut:
+  application:
+    name: keyManagerRest
+  context-path: /api/v1
+
+grpc:
+  client:
+    plaintext: true
+    max-retry-attemps: 10
+  channels:
+    key-manager:
+      address: 'localhost:50051'
+      plaintext: true
+      max-retry-attemps: 5

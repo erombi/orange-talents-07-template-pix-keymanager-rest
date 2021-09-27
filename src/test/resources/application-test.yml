@@ -1,0 +1,4 @@
+micronaut:
+  application:
+    name: keyManagerRest
+  context-path: /api/v1
