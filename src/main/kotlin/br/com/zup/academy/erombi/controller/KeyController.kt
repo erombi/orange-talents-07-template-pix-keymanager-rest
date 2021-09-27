@@ -1,7 +1,9 @@
 package br.com.zup.academy.erombi.controller
 
 import br.com.zup.academy.erombi.KeyManagerGrpcServiceGrpc
+import br.com.zup.academy.erombi.RemoveKeyRequest
 import br.com.zup.academy.erombi.controller.request.NovaKeyRequest
+import br.com.zup.academy.erombi.controller.request.RemoveKeyRestRequest
 import br.com.zup.academy.erombi.controller.response.NovaKeyResponse
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -9,10 +11,9 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Delete
 import io.micronaut.http.annotation.Post
-import io.micronaut.http.uri.UriBuilder
 import io.micronaut.validation.Validated
-import java.net.URI
 import javax.validation.Valid
 
 @Validated
@@ -50,6 +51,32 @@ class KeyController(
                 }
 
                 else -> HttpResponse.serverError(hashMapOf(Pair("error", capturaDescription(e))))
+            }
+        }
+    }
+
+    @Delete
+    fun removeKey(@Body @Valid request: RemoveKeyRestRequest): HttpResponse<Any> {
+        return try {
+            val response = grpcClient.removeKey(
+                RemoveKeyRequest.newBuilder()
+                    .setIdKey(request.idKey)
+                    .setIdCliente(request.idCliente)
+                    .build()
+            )
+
+            HttpResponse.ok()
+        } catch (e: StatusRuntimeException) {
+            when(e.status.code) {
+                Status.Code.NOT_FOUND -> {
+                    HttpResponse.notFound()
+                }
+                Status.Code.UNAVAILABLE -> {
+                    HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                }
+
+
+                else -> HttpResponse.serverError()
             }
         }
     }

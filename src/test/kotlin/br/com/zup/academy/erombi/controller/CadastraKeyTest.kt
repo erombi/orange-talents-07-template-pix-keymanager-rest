@@ -30,7 +30,7 @@ import br.com.zup.academy.erombi.model.TipoConta as tipoContaModel
 import br.com.zup.academy.erombi.model.TipoKey as tipoKeyModel
 
 @MicronautTest
-internal class KeyControllerTest {
+internal class CadastraKeyTest {
 
     @Inject
     lateinit var grpcClient : KeyManagerGrpcServiceGrpc.KeyManagerGrpcServiceBlockingStub
