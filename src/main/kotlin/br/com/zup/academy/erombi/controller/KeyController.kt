@@ -1,5 +1,6 @@
 package br.com.zup.academy.erombi.controller
 
+import br.com.zup.academy.erombi.ConsultaKeyPorClienteRequest
 import br.com.zup.academy.erombi.ConsultaKeyRequest
 import br.com.zup.academy.erombi.KeyManagerGrpcServiceGrpc
 import br.com.zup.academy.erombi.RemoveKeyRequest
@@ -7,6 +8,7 @@ import br.com.zup.academy.erombi.controller.request.NovaKeyRequest
 import br.com.zup.academy.erombi.controller.request.RemoveKeyRestRequest
 import br.com.zup.academy.erombi.controller.response.ConsultaKeyRestResponse
 import br.com.zup.academy.erombi.controller.response.ContaRestResponse
+import br.com.zup.academy.erombi.controller.response.KeyDescriptorRestResponse
 import br.com.zup.academy.erombi.controller.response.NovaKeyResponse
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -117,6 +119,35 @@ class KeyController(
         } catch (e: StatusRuntimeException) {
             when(e.status.code) {
                 Status.Code.NOT_FOUND -> HttpResponse.notFound()
+                Status.Code.INVALID_ARGUMENT -> HttpResponse.badRequest()
+
+                else -> HttpResponse.serverError()
+            }
+        }
+    }
+
+    @Get("/porCliente")
+    fun consultaKeyPorCliente(@QueryValue idCliente: String): HttpResponse<Any> {
+        return try {
+            val response = grpcClient.consultaKeysPorCliente(
+                ConsultaKeyPorClienteRequest.newBuilder()
+                    .setIdCliente(idCliente)
+                    .build()
+            )
+
+            val keys = response.keysList.map {
+                KeyDescriptorRestResponse(
+                    it.pixId,
+                    it.clienteId,
+                    it.tipoKey.name,
+                    it.tipoConta.name,
+                    LocalDateTime.ofEpochSecond(it.criadoEm.seconds, it.criadoEm.nanos, ZoneOffset.UTC)
+                )
+            }
+
+            return HttpResponse.ok(hashMapOf("keys" to keys))
+        } catch (e: StatusRuntimeException) {
+            when(e.status.code) {
                 Status.Code.INVALID_ARGUMENT -> HttpResponse.badRequest()
 
                 else -> HttpResponse.serverError()
