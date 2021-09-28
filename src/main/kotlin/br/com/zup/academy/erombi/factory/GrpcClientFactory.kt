@@ -1,4 +1,4 @@
-package br.com.zup.academy.erombi.client
+package br.com.zup.academy.erombi.factory
 
 import br.com.zup.academy.erombi.KeyManagerGrpcServiceGrpc
 import io.grpc.ManagedChannel

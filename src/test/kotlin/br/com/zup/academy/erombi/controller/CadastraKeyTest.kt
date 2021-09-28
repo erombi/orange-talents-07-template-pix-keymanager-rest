@@ -1,7 +1,7 @@
 package br.com.zup.academy.erombi.controller
 
 import br.com.zup.academy.erombi.*
-import br.com.zup.academy.erombi.client.GrpcClientFactory
+import br.com.zup.academy.erombi.factory.GrpcClientFactory
 import io.grpc.Status
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Replaces
@@ -73,7 +73,7 @@ internal class CadastraKeyTest {
 
         val response = httpClient.toBlocking().exchange(httpRequest, responseModel::class.java)
 
-        Assertions.assertEquals(HttpStatus.CREATED, response.status())
+        assertEquals(HttpStatus.CREATED, response.status())
         assertTrue(response.headers.contains("Location"))
         assertTrue(response.header("Location")!!.contains(response.body()!!.pixId))
     }
@@ -81,7 +81,7 @@ internal class CadastraKeyTest {
     @Test
     fun `deve retornar BAD_REQUEST quando conta invalida`() {
         val idCliente = UUID.randomUUID()
-        val pixId = UUID.randomUUID()
+
         val key = "48243048812"
 
         val grpcRequest = NovaKeyRequest.newBuilder()
@@ -135,7 +135,7 @@ internal class CadastraKeyTest {
             requestModel(idCliente, tipoKeyModel.CPF, key, tipoContaModel.CONTA_CORRENTE)
         )
 
-        val response = httpClient.toBlocking().exchange(httpRequest, responseModel::class.java)
+        httpClient.toBlocking().exchange(httpRequest, responseModel::class.java)
 
         `when`(
             grpcClient.cadastrarKey(grpcRequest)
@@ -155,7 +155,7 @@ internal class CadastraKeyTest {
     @Test
     fun `deve retornar SERVICE_UNAVAILABLE quando servico fora do ar`() {
         val idCliente = UUID.randomUUID()
-        val pixId = UUID.randomUUID()
+
         val key = "48243048812"
 
         val grpcRequest = NovaKeyRequest.newBuilder()
@@ -187,7 +187,7 @@ internal class CadastraKeyTest {
     @Test
     fun `deve retornar INTERNAL_SERVER_ERROR quando servico fora do ar`() {
         val idCliente = UUID.randomUUID()
-        val pixId = UUID.randomUUID()
+
         val key = "48243048812"
 
         val grpcRequest = NovaKeyRequest.newBuilder()
